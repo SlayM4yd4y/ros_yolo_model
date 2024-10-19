@@ -1,25 +1,19 @@
 <?xml version="1.0"?>
-<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>ros_yolo_model</name>
-  <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="attilaotvos8@g.com">ajr</maintainer>
-  <license>GNU GENERAL PUBLIC LICENSE 3.0</license>
+  <version>0.0.1</version>
+  <description>YOLO model implementation for ROS2</description>
 
-  <test_depend>ament_copyright</test_depend>
-  <test_depend>ament_flake8</test_depend>
-  <test_depend>ament_pep257</test_depend>
-  <test_depend>python3-pytest</test_depend>
-  <buildtool_depend>ament_python</buildtool_depend>
-  <depend>rclpy</depend>
+  <maintainer email="attilaotvos8@g.com">M4yd4y</maintainer>
+  <license>GNU 3.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>rclcpp</depend>
   <depend>sensor_msgs</depend>
-  <depend>std_msgs</depend>
   <depend>cv_bridge</depend>
-
-  <test_depend>pytest</test_depend>
+  <depend>OpenCV</depend>
 
   <export>
-    <build_type>ament_python</build_type>
+    <build_type>ament_cmake</build_type>
   </export>
 </package>
