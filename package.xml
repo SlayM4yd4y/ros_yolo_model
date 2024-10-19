@@ -4,13 +4,20 @@
   <name>ros_yolo_model</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="attilaotvos8@gmail.com">ajr</maintainer>
-  <license>TODO: License declaration</license>
+  <maintainer email="attilaotvos8@g.com">ajr</maintainer>
+  <license>GNU GENERAL PUBLIC LICENSE 3.0</license>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
   <test_depend>python3-pytest</test_depend>
+  <buildtool_depend>ament_python</buildtool_depend>
+  <depend>rclpy</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>cv_bridge</depend>
+
+  <test_depend>pytest</test_depend>
 
   <export>
     <build_type>ament_python</build_type>
