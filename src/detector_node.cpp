@@ -1,4 +1,4 @@
-#include "ros_yolo_model/detector.hpp"
+#include "detector.hpp"
 
 YOLODetector::YOLODetector() : Node("yolo_detector")
 {

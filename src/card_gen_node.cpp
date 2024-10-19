@@ -1,4 +1,4 @@
-#include "ros_yolo_model/card_gen.hpp"
+#include "card_gen.hpp"
 
 CardGenerator::CardGenerator() : Node("card_generator")
 {

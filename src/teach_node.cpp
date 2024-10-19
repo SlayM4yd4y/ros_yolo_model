@@ -1,4 +1,4 @@
-#include "ros_yolo_model/teach.hpp"
+#include "teach.hpp"
 
 YOLOTrainer::YOLOTrainer() : Node("yolo_trainer")
 {

@@ -11,14 +11,14 @@ find_package(sensor_msgs REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(OpenCV REQUIRED)
 
-include_directories(include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/headers) 
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-add_executable(teach_node src/teach.cpp)
+add_executable(teach_node src/teach_node.cpp)
 ament_target_dependencies(teach_node rclcpp OpenCV)
-add_executable(detector_node src/detector.cpp)
+add_executable(detector_node src/detector_node.cpp)
 ament_target_dependencies(detector_node rclcpp sensor_msgs cv_bridge OpenCV)
-add_executable(card_gen_node src/card_gen.cpp)
+add_executable(card_gen_node src/card_gen_node.cpp)
 ament_target_dependencies(card_gen_node rclcpp OpenCV)
 
 install(TARGETS
@@ -29,6 +29,9 @@ install(TARGETS
 )
 install(DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}/
+)
+install(DIRECTORY headers
+  DESTINATION include/${PROJECT_NAME}/headers
 )
 
 ament_package()
