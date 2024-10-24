@@ -1,27 +1,57 @@
 #include "teach.hpp"
+#include <cstdlib>
+#include <iostream>
+#include <filesystem>
+#include <fstream>
+#include <stdexcept>
 
-YOLOTrainer::YOLOTrainer() : Node("yolo_trainer")
-{
-    RCLCPP_INFO(this->get_logger(), "YOLO Trainer Node Started");
+namespace fs = std::filesystem;
+
+YOLOTrainer::YOLOTrainer() 
+: Node("yolo_trainer") {
+    RCLCPP_INFO(this->get_logger(), "YOLO Trainer node initialized");
 }
 
-void YOLOTrainer::train_model(const std::string& train_data_path, const std::string& val_data_path, const std::string& output_model_path)
-{
-    // YOLO modell betöltése és tanítási folyamat.
-    RCLCPP_INFO(this->get_logger(), "YOLO model training started...");
-    // Itt OpenCV és PyTorch-alapú YOLO tanítási algoritmus használata ajánlott.
-    // Implementáld a tanítási folyamatot itt.
-    RCLCPP_INFO(this->get_logger(), "Model trained and saved to %s", output_model_path.c_str());
+void YOLOTrainer::train(const std::string& dataset_path, const std::string& model_output_path) {
+    // Adatkészlet közvetlen elérése a letöltött és kicsomagolt adatokból
+    std::string data_yaml = dataset_path + "/data.yaml";
+
+    // Tanítás indítása
+    start_training(data_yaml, model_output_path);
 }
 
-int main(int argc, char **argv)
-{
+void YOLOTrainer::start_training(const std::string& data_yaml, const std::string& model_output_path) {
+    RCLCPP_INFO(this->get_logger(), "Starting training...");
+
+    // YOLOv5 modell betanítási parancs
+    std::string command = "python3 /home/ajr/ros2_ws/src/yolov5/train.py --img 640 --batch 16 --epochs 100 --data " + data_yaml + " --weights yolov5s.pt --cache --name " + model_output_path;
+    int result = std::system(command.c_str());
+
+    if (result != 0) {
+        RCLCPP_ERROR(this->get_logger(), "Training failed.");
+    } else {
+        RCLCPP_INFO(this->get_logger(), "Training completed successfully.");
+    }
+}
+
+int main(int argc, char **argv) {
     rclcpp::init(argc, argv);
-    auto trainer = std::make_shared<YOLOTrainer>();
-
-    trainer->train_model("path/to/train", "path/to/val", "output_model_path");
     
-    rclcpp::spin(trainer);
+    auto node = std::make_shared<YOLOTrainer>();
+
+    // Paraméterek beolvasása
+    if (argc < 3) {
+        std::cerr << "Usage: ros2 run ros_yolo_model teach_node <dataset_path> <model_output_path>" << std::endl;
+        return 1;
+    }
+
+    std::string dataset_path = argv[1];  // A kézzel letöltött adatok elérési útvonala
+    std::string model_output_path = argv[2];
+
+    // Modell tanítása
+    node->train(dataset_path, model_output_path);
+
+    rclcpp::spin(node);
     rclcpp::shutdown();
     return 0;
 }
