@@ -38,7 +38,8 @@ int main(int argc, char **argv)
     std::string package_path = ament_index_cpp::get_package_share_directory(package_name);
     std::cout << "The package path is: " << package_path << std::endl;
 
-    
+    card_gen->generate_card(package_path + "/../../../../src/ros_yolo_model/generated_cards");
+
     rclcpp::spin(card_gen);
     rclcpp::shutdown();
     return 0;
