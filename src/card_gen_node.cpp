@@ -1,8 +1,5 @@
 #include "card_gen.hpp"
-#include <filesystem>
-#include <unistd.h>
-#include "ament_index_cpp/get_package_share_directory.hpp"
-#include <iostream>
+
 
 /* !!!!! to be implemented
 //initialize the static variable 'counter' which is responsible for the card number
@@ -24,8 +21,13 @@ void CardGenerator::generate_card(const std::string& output_dir, int count)
     }
 
     // generating the dummy card
-    cv::Mat card(400, 640, CV_8UC3, cv::Scalar(255, 255, 255));
-    cv::putText(card, "Student Card", cv::Point(50, 200), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 0, 0), 2);
+    cv::Mat card(359, 561, CV_8UC3, cv::Scalar(255, 255, 255));
+
+    auto ft2 = cv::freetype::createFreeType2();
+    ft2->loadFontData("fonts/Montserrat/Montserrat-VariableFont_wght.ttf", 0);
+
+    ft2->putText(card, "HALLGATÓI", cv::Point(49, 132), 30, cv::Scalar(205, 182, 0), 1, cv::LINE_AA, false);
+    ft2->putText(card, "KÁRTYA", cv::Point(50, 168), 28, cv::Scalar(205, 182, 0), -1, cv::LINE_AA, false);
     
     // variable with the card filename
     std::string card_filename = output_dir + "/card" + std::to_string(count) + ".png";
