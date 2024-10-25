@@ -24,7 +24,7 @@ devel_isolated/
 #tanitas utani fajlok(best.pt stb, lehet kesobb github lfs-el felr.)
 output_model/
 output_model2/
-
+output_model_fine/
 #clion
 .idea/
 cmake-build-debug/
