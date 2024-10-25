@@ -8,6 +8,9 @@
 
 class YOLODetector : public rclcpp::Node
 {
+private:
+    rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr image_sub_;
+    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr object_pub_;    
 public:
     YOLODetector();
     void detect_callback(const sensor_msgs::msg::Image::SharedPtr msg);
