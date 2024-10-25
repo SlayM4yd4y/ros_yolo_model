@@ -21,7 +21,10 @@ void YOLOTrainer::train(const std::string& dataset_path, const std::string& mode
 void YOLOTrainer::start_training(const std::string& data_yaml, const std::string& model_output_path) {
     RCLCPP_INFO(this->get_logger(), "Tanitas megkezdese...");
     // YOLOv5 modell betanítási parancs 16 batch-el, 100 epoch-al, elegnek kell lennie
-    std::string command = "python3 /home/ajr/ros2_ws/src/yolov5/train.py --img 640 --batch 16 --epochs 100 --data " + data_yaml + " --weights yolov5s.pt --cache --name " + model_output_path;
+    //std::string command = "python3 /home/ajr/ros2_ws/src/yolov5/train.py --img 640 --batch 16 --epochs 100 --data " + data_yaml + " --weights yolov5s.pt --cache --name " + model_output_path;
+    // YOLOv5 modell fine-tuning parancs korábbi súlyokkal (best.pt) folytatva
+    std::string command = "python3 /home/ajr/ros2_ws/src/yolov5/train.py --img 640 --batch 16 --epochs 20 --data " + data_yaml + 
+                          " --weights /home/ajr/ros2_ws/src/ros_yolo_model/output_model2/weights/best.pt --cache --name " + model_output_path;
     int result = std::system(command.c_str());
     if (result != 0) {RCLCPP_ERROR(this->get_logger(), "Nem sikerult a tanitas.");
     } else {RCLCPP_INFO(this->get_logger(), "Sikeres tanitas.");}
