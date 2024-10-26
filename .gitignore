@@ -25,12 +25,18 @@ devel_isolated/
 output_model/
 output_model2/
 output_model_fine/
+output_model_fine2/
+output_model_fine22/  
+output_model_fine23/
+output_model_fine24/
+output_model_fine25/
 #clion
 .idea/
 cmake-build-debug/
 
 #dataset
 dataset/
+ext_dataset/
 
 #cards
 generated_cards/
