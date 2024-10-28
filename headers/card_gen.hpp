@@ -18,4 +18,6 @@ public:
     void generate_card(const std::string& output_dir, int count);
 };
 
+std::string package_path();
+
 #endif  // ROS_YOLO_MODEL_CARD_GEN_HPP_
