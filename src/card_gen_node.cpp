@@ -26,8 +26,12 @@ void CardGenerator::generate_card(const std::string& output_dir, int count)
     auto ft2 = cv::freetype::createFreeType2();
     ft2->loadFontData(package_path() + "/fonts/Montserrat/Montserrat-VariableFont_wght.ttf", 0);
 
-    ft2->putText(card, "HALLGATÓI", cv::Point(49, 132), 30, cv::Scalar(205, 182, 0), 1, cv::LINE_AA, false);
-    ft2->putText(card, "KÁRTYA", cv::Point(50, 168), 28, cv::Scalar(205, 182, 0), -1, cv::LINE_AA, false);
+    ft2->putText(card, "HALLGATÓI", cv::Point(49, 132), 35, cv::Scalar(205, 182, 0), 2, cv::LINE_AA, false);
+    ft2->putText(card, "KÁRTYA", cv::Point(50, 168), 33, cv::Scalar(205, 182, 0), -1, cv::LINE_AA, false);
+    ft2->putText(card, "KÁRTYASZÁM", cv::Point(52, 236), 12, cv::Scalar(205, 182, 0), 1, cv::LINE_AA, false);
+    ft2->putText(card, "NEPTUN KÓD", cv::Point(52, 266), 12, cv::Scalar(205, 182, 0), 1, cv::LINE_AA, false);
+    
+
     
     // variable with the card filename
     std::string card_filename = output_dir + "/card" + std::to_string(count) + ".png";
