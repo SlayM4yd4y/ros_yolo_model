@@ -21,6 +21,7 @@ add_executable(teach_node src/teach_node.cpp)
 ament_target_dependencies(teach_node rclcpp OpenCV)
 add_executable(detector_node src/detector_node.cpp)
 ament_target_dependencies(detector_node rclcpp sensor_msgs std_msgs cv_bridge OpenCV)
+target_link_libraries(detector_node ${OpenCV_LIBRARIES})
 add_executable(card_gen_node src/card_gen_node.cpp)
 ament_target_dependencies(card_gen_node rclcpp OpenCV ament_index_cpp)
 
