@@ -10,11 +10,6 @@ def generate_launch_description():
         ),
         Node(
             package='ros_yolo_model',
-            executable='detector_node',
-            name='detector'
-        ),
-        Node(
-            package='ros_yolo_model',
             executable='card_gen_node',
             name='card_gen'
         )
