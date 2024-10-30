@@ -15,7 +15,7 @@ def generate_launch_description():
             executable="detector_node",
             name="detector_node",
             parameters=[
-                {"weights_path": "/home/ajr/ros2_ws/src/ros_yolo_model/output_model_fine/weights/best.pt"},
+                {"weights_path": "/home/ajr/ros2_ws/src/ros_yolo_model/model/second_train/weights/best.pt"},
                 {"source_type": LaunchConfiguration("source_type")},
                 {"video_path": LaunchConfiguration("video_path")},
                 {"image_path": LaunchConfiguration("image_path")},
