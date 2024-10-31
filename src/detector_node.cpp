@@ -39,6 +39,27 @@ void DetectorNode::executeDetectionCommand(const std::string& source) {
     }
 }
 
+
+void DetectorNode::detectImage(const std::string& image_path) {
+    executeDetectionCommand(image_path);
+
+    auto result_msg = std::make_shared<std_msgs::msg::String>();
+    result_msg->data = "Képdetektálás befejezve.";
+    object_pub_->publish(*result_msg);
+}
+
+
+void DetectorNode::detectImageCallback(const sensor_msgs::msg::Image::SharedPtr msg) {
+    cv::Mat frame = cv_bridge::toCvCopy(msg, "bgr8")->image;
+    std::string image_path = "/tmp/input_image.jpg";
+    cv::imwrite(image_path, frame);
+    executeDetectionCommand(image_path);
+    auto result_msg = std::make_shared<std_msgs::msg::String>();
+    result_msg->data = "Képdeteckálás befejezve.";
+    object_pub_->publish(*result_msg);
+}
+
+
 void DetectorNode::detectLiveCamera(int camera_id) {
     executeDetectionCommand(std::to_string(camera_id));
 
