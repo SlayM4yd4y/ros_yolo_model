@@ -11,11 +11,13 @@
 class DetectorNode : public rclcpp::Node {
 public:
     DetectorNode();
-    
+    void run();
 
 private:
+    void detectImageCallback(const sensor_msgs::msg::Image::SharedPtr msg);
     void executeDetectionCommand(const std::string& source);
     void detectLiveCamera(int camera_id);
+    void detectImage(const std::string& image_path);
     rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr image_sub_;
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr object_pub_;
     std::string weights_path_;
