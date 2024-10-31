@@ -18,6 +18,7 @@ private:
     void executeDetectionCommand(const std::string& source);
     void detectLiveCamera(int camera_id);
     void detectImage(const std::string& image_path);
+    void detectVideo(const std::string& video_path);
     rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr image_sub_;
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr object_pub_;
     std::string weights_path_;
