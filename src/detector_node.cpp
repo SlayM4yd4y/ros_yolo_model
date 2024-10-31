@@ -20,6 +20,18 @@ DetectorNode::DetectorNode() : Node("detector_node") {
     object_pub_ = this->create_publisher<std_msgs::msg::String>("detected_objects", 10);
 }
 
+void DetectorNode::run() {
+    if (source_type_ == "video") {
+        detectVideo(video_path_);
+    } else if (source_type_ == "image") {
+        detectImage(image_path_);
+    } else if (source_type_ == "camera") {
+        detectLiveCamera(camera_id_);
+    } else {
+        RCLCPP_ERROR(this->get_logger(), "Érvénytelen source_type: %s", source_type_.c_str());
+    }
+}
+
 
 void DetectorNode::executeDetectionCommand(const std::string& source) {
     std::stringstream command;
@@ -55,7 +67,7 @@ void DetectorNode::detectImageCallback(const sensor_msgs::msg::Image::SharedPtr 
     cv::imwrite(image_path, frame);
     executeDetectionCommand(image_path);
     auto result_msg = std::make_shared<std_msgs::msg::String>();
-    result_msg->data = "Képdeteckálás befejezve.";
+    result_msg->data = "Képdetektálás befejezve.";
     object_pub_->publish(*result_msg);
 }
 
@@ -65,6 +77,14 @@ void DetectorNode::detectLiveCamera(int camera_id) {
 
     auto result_msg = std::make_shared<std_msgs::msg::String>();
     result_msg->data = "Élő kamera detektálás befejezve.";
+    object_pub_->publish(*result_msg);
+}
+
+void DetectorNode::detectVideo(const std::string& video_path) {
+    executeDetectionCommand(video_path);
+
+    auto result_msg = std::make_shared<std_msgs::msg::String>();
+    result_msg->data = "Videó detektálás befejezve.";
     object_pub_->publish(*result_msg);
 }
 
