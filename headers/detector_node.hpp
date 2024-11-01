@@ -12,7 +12,6 @@ class DetectorNode : public rclcpp::Node {
 public:
     DetectorNode();
     void run();
-
 private:
     void detectImageCallback(const sensor_msgs::msg::Image::SharedPtr msg);
     void executeDetectionCommand(const std::string& source);

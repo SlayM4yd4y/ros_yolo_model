@@ -1,9 +1,10 @@
 #include "detector_node.hpp"
 #include <sstream>
 #include <cstdlib>
+#include <future>
 
 DetectorNode::DetectorNode() : Node("detector_node") {
-    // Paraméterek inicializálása
+    RCLCPP_INFO(this->get_logger(), "DetectorNode konstruktora elindult.");
     weights_path_ = declare_parameter("weights_path", "/home/ajr/ros2_ws/src/ros_yolo_model/model/second_train/weights/best.pt");
     source_type_ = declare_parameter("source_type", "camera");
     video_path_ = declare_parameter("video_path", "/path/to/video.mp4");
@@ -14,26 +15,35 @@ DetectorNode::DetectorNode() : Node("detector_node") {
     save_dir_ = declare_parameter("save_dir", "/path/to/output");
     view_img_ = declare_parameter("view_img", true);
 
-    // Kép előfizetés és eredmény közzététel
     image_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
         "image", 10, std::bind(&DetectorNode::detectImageCallback, this, std::placeholders::_1));
     object_pub_ = this->create_publisher<std_msgs::msg::String>("detected_objects", 10);
+    RCLCPP_INFO(this->get_logger(), "DetectorNode sikeresen inicializálva.");
 }
 
 void DetectorNode::run() {
+    RCLCPP_INFO(this->get_logger(), "Run függvény elindult.");
+
     if (source_type_ == "video") {
+        RCLCPP_INFO(this->get_logger(), "Video forrást választott.");
         detectVideo(video_path_);
     } else if (source_type_ == "image") {
+        RCLCPP_INFO(this->get_logger(), "Image forrást választott.");
         detectImage(image_path_);
     } else if (source_type_ == "camera") {
+        RCLCPP_INFO(this->get_logger(), "Kamera forrást választott.");
         detectLiveCamera(camera_id_);
     } else {
         RCLCPP_ERROR(this->get_logger(), "Érvénytelen source_type: %s", source_type_.c_str());
     }
+
+    RCLCPP_INFO(this->get_logger(), "Run függvény véget ért.");
 }
 
 
 void DetectorNode::executeDetectionCommand(const std::string& source) {
+     RCLCPP_INFO(this->get_logger(), "executeDetectionCommand elkezdődött forrás: %s", source.c_str());
+
     std::stringstream command;
     command << "python3 /home/ajr/ros2_ws/src/yolov5/detect.py --weights " << weights_path_
             << " --source " << source
@@ -41,16 +51,22 @@ void DetectorNode::executeDetectionCommand(const std::string& source) {
             << " --iou-thres " << iou_thres_
             << " --project " << save_dir_
             << " --save-txt";
-    
-    if (view_img_) {command << " --view-img";}
-    int result = std::system(command.str().c_str());
-    if (result != 0) {
-        RCLCPP_ERROR(this->get_logger(), "Detektálási parancs sikertelen forrásnál: %s", source.c_str());
-    } else {
-        RCLCPP_INFO(this->get_logger(), "Detektálás befejezve forrásnál: %s", source.c_str());
-    }
-}
 
+    if (view_img_) { command << " --view-img"; }
+
+    std::string command_str = command.str();
+    RCLCPP_INFO(this->get_logger(), "Parancs futtatása: %s", command_str.c_str());
+
+    //külön szálon
+    std::thread exec_thread([command_str]() {
+        int result = std::system(command_str.c_str());
+        if (result != 0) {
+            std::cerr << "A szkript futása sikertelen, hiba történt: " << result << std::endl;
+        }
+    });
+    exec_thread.join();  //varakozas amig bef. a szal
+    RCLCPP_INFO(this->get_logger(), "Detektálás véget ért forrásnál: %s", source.c_str());
+}
 
 void DetectorNode::detectImage(const std::string& image_path) {
     executeDetectionCommand(image_path);
@@ -58,6 +74,8 @@ void DetectorNode::detectImage(const std::string& image_path) {
     auto result_msg = std::make_shared<std_msgs::msg::String>();
     result_msg->data = "Képdetektálás befejezve.";
     object_pub_->publish(*result_msg);
+    RCLCPP_INFO(this->get_logger(), "Eredmény üzenet publikálva az object_pub_-ra.");
+    
 }
 
 
@@ -69,6 +87,8 @@ void DetectorNode::detectImageCallback(const sensor_msgs::msg::Image::SharedPtr 
     auto result_msg = std::make_shared<std_msgs::msg::String>();
     result_msg->data = "Képdetektálás befejezve.";
     object_pub_->publish(*result_msg);
+    RCLCPP_INFO(this->get_logger(), "Eredmény üzenet publikálva az object_pub_-ra.");
+    
 }
 
 
@@ -78,22 +98,26 @@ void DetectorNode::detectLiveCamera(int camera_id) {
     auto result_msg = std::make_shared<std_msgs::msg::String>();
     result_msg->data = "Élő kamera detektálás befejezve.";
     object_pub_->publish(*result_msg);
+    RCLCPP_INFO(this->get_logger(), "Eredmény üzenet publikálva az object_pub_-ra.");
+    
 }
 
 void DetectorNode::detectVideo(const std::string& video_path) {
     executeDetectionCommand(video_path);
-
     auto result_msg = std::make_shared<std_msgs::msg::String>();
     result_msg->data = "Videó detektálás befejezve.";
     object_pub_->publish(*result_msg);
+    RCLCPP_INFO(this->get_logger(), "Eredmény üzenet publikálva az object_pub_-ra.");
+    
 }
 
 int main(int argc, char **argv) {
+    std::cout << "Program elindult" << std::endl;
     rclcpp::init(argc, argv);
     auto node = std::make_shared<DetectorNode>();
-
+    RCLCPP_INFO(node->get_logger(), "DetectorNode létrehozva és futtatásra kész.");
     node->run();
-    rclcpp::spin(node);
+    rclcpp::spin_some(node);
     rclcpp::shutdown();
     return 0;
 }
