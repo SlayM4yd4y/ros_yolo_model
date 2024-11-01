@@ -32,7 +32,7 @@ void DetectorNode::run() {
         detectImage(image_path_);
     } else if (source_type_ == "camera") {
         RCLCPP_INFO(this->get_logger(), "Kamera forrást választott.");
-        detectLiveCamera(camera_id_);
+        //automatikusan meghivodik a callback amikor érkezik a kép az image topicon
     } else {
         RCLCPP_ERROR(this->get_logger(), "Érvénytelen source_type: %s", source_type_.c_str());
     }
@@ -74,7 +74,7 @@ void DetectorNode::detectImage(const std::string& image_path) {
     auto result_msg = std::make_shared<std_msgs::msg::String>();
     result_msg->data = "Képdetektálás befejezve.";
     object_pub_->publish(*result_msg);
-    RCLCPP_INFO(this->get_logger(), "Eredmény üzenet publikálva az object_pub_-ra.");
+    RCLCPP_INFO(this->get_logger(), "Eredmény üzenet publikálva a /detected_objects topic-ra.");
     
 }
 
@@ -85,29 +85,29 @@ void DetectorNode::detectImageCallback(const sensor_msgs::msg::Image::SharedPtr 
     cv::imwrite(image_path, frame);
     executeDetectionCommand(image_path);
     auto result_msg = std::make_shared<std_msgs::msg::String>();
-    result_msg->data = "Képdetektálás befejezve.";
+    result_msg->data = "Élő képdetektálás befejezve.";
     object_pub_->publish(*result_msg);
-    RCLCPP_INFO(this->get_logger(), "Eredmény üzenet publikálva az object_pub_-ra.");
+    RCLCPP_INFO(this->get_logger(), "Eredmény üzenet publikálva a /detected_objects topic-ra.");
     
 }
 
 
-void DetectorNode::detectLiveCamera(int camera_id) {
+/*void DetectorNode::detectLiveCamera(int camera_id) {
     executeDetectionCommand(std::to_string(camera_id));
 
     auto result_msg = std::make_shared<std_msgs::msg::String>();
     result_msg->data = "Élő kamera detektálás befejezve.";
     object_pub_->publish(*result_msg);
-    RCLCPP_INFO(this->get_logger(), "Eredmény üzenet publikálva az object_pub_-ra.");
+    RCLCPP_INFO(this->get_logger(), "Eredmény üzenet publikálva a /detected_objects topic-ra.");
     
-}
+}*/ //felesleges
 
 void DetectorNode::detectVideo(const std::string& video_path) {
     executeDetectionCommand(video_path);
     auto result_msg = std::make_shared<std_msgs::msg::String>();
     result_msg->data = "Videó detektálás befejezve.";
     object_pub_->publish(*result_msg);
-    RCLCPP_INFO(this->get_logger(), "Eredmény üzenet publikálva az object_pub_-ra.");
+    RCLCPP_INFO(this->get_logger(), "Eredmény üzenet publikálva a /detected_objects topic-ra.");
     
 }
 
