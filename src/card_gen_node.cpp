@@ -60,7 +60,7 @@ int main(int argc, char **argv)
         card_gen->generate_card(package_path() + "/generated_cards", i);
     }
 
-    rclcpp::spin(card_gen);
+    rclcpp::spin_some(card_gen);
     rclcpp::shutdown();
     return 0;
 }
