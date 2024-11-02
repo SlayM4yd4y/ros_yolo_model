@@ -43,13 +43,20 @@ void CardGenerator::generate_card(const std::string& output_dir, int count)
         return;
     }
 
-
+    cv::Mat logo = cv::imread(package_path() + "/img/card_gen/logo.png");
+    if (logo.empty()) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to load logo image");
+        return;
+    }
+    
     cv::Rect sb(cv::Point(0, 0), sidebar.size());
     cv::Rect bc(cv::Point(41, 29), barcode.size());
+    cv::Rect lg(cv::Point(254, 23), logo.size());
+
 
     sidebar.copyTo(card(sb));
     barcode.copyTo(card(bc));
-
+    logo.copyTo(card(lg));
 
 
     // variable with the card filename
