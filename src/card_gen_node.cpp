@@ -31,8 +31,16 @@ void CardGenerator::generate_card(const std::string& output_dir, int count)
     ft2->putText(card, "KÁRTYASZÁM", cv::Point(52, 236), 12, cv::Scalar(205, 182, 0), 1, cv::LINE_AA, false);
     ft2->putText(card, "NEPTUN KÓD", cv::Point(52, 266), 12, cv::Scalar(205, 182, 0), 1, cv::LINE_AA, false);
     
+    cv::Mat sidebar = cv::imread(package_path() + "/img/card_gen/sidebar.png");
+    if (sidebar.empty()) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to load sidebar image");
+        return;
+    }
 
-    
+    cv::Rect roi(cv::Point(0, 0), sidebar.size());
+    sidebar.copyTo(card(roi));
+
+
     // variable with the card filename
     std::string card_filename = output_dir + "/card" + std::to_string(count) + ".png";
 
