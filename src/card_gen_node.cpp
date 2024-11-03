@@ -37,12 +37,20 @@ void CardGenerator::generate_card(const std::string& output_dir, int count)
         RCLCPP_ERROR(this->get_logger(), "Failed to load barcode image");
         return;
     }
+
+    cv::Mat portrait = cv::imread(package_path() + "/img/card_gen/portrait1.png");
+    if (portrait.empty()) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to load portrait image");
+        return;
+    }
     
     cv::Rect ct(cv::Point(0, 0), card_template.size());
     cv::Rect bc(cv::Point(41, 29), barcode.size());
+    cv::Rect pt(cv::Point(382, 122), portrait.size());
 
     card_template.copyTo(card(ct));
     barcode.copyTo(card(bc));
+    portrait.copyTo(card(pt));
 
     // variable with the card filename
     std::string card_filename = output_dir + "/card" + std::to_string(count) + ".png";
