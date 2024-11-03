@@ -21,19 +21,14 @@ void CardGenerator::generate_card(const std::string& output_dir, int count)
     }
 
     // generating the dummy card
-    cv::Mat card(359, 561, CV_8UC3, cv::Scalar(255, 255, 255));
+    cv::Mat card(359, 553, CV_8UC3, cv::Scalar(255, 255, 255));
 
     auto ft2 = cv::freetype::createFreeType2();
     ft2->loadFontData(package_path() + "/fonts/Montserrat/Montserrat-VariableFont_wght.ttf", 0);
 
-    ft2->putText(card, "HALLGATÓI", cv::Point(41, 132), 35, cv::Scalar(205, 182, 0), 2, cv::LINE_AA, false);
-    ft2->putText(card, "KÁRTYA", cv::Point(42, 168), 33, cv::Scalar(205, 182, 0), -1, cv::LINE_AA, false);
-    ft2->putText(card, "KÁRTYASZÁM", cv::Point(44, 236), 12, cv::Scalar(205, 182, 0), 1, cv::LINE_AA, false);
-    ft2->putText(card, "NEPTUN KÓD", cv::Point(44, 266), 12, cv::Scalar(205, 182, 0), 1, cv::LINE_AA, false);
-    
-    cv::Mat sidebar = cv::imread(package_path() + "/img/card_gen/sidebar.png");
-    if (sidebar.empty()) {
-        RCLCPP_ERROR(this->get_logger(), "Failed to load sidebar image");
+    cv::Mat card_template = cv::imread(package_path() + "/img/card_gen/card_template.png");
+    if (card_template.empty()) {
+        RCLCPP_ERROR(this->get_logger(), "Failed to load card template image");
         return;
     }
 
@@ -42,22 +37,12 @@ void CardGenerator::generate_card(const std::string& output_dir, int count)
         RCLCPP_ERROR(this->get_logger(), "Failed to load barcode image");
         return;
     }
-
-    cv::Mat logo = cv::imread(package_path() + "/img/card_gen/logo.png");
-    if (logo.empty()) {
-        RCLCPP_ERROR(this->get_logger(), "Failed to load logo image");
-        return;
-    }
     
-    cv::Rect sb(cv::Point(0, 0), sidebar.size());
+    cv::Rect ct(cv::Point(0, 0), card_template.size());
     cv::Rect bc(cv::Point(41, 29), barcode.size());
-    cv::Rect lg(cv::Point(254, 23), logo.size());
 
-
-    sidebar.copyTo(card(sb));
+    card_template.copyTo(card(ct));
     barcode.copyTo(card(bc));
-    logo.copyTo(card(lg));
-
 
     // variable with the card filename
     std::string card_filename = output_dir + "/card" + std::to_string(count) + ".png";
