@@ -31,6 +31,8 @@ output_model_fine23/
 output_model_fine24/
 output_model_fine25/
 output_model_fine02/
+card_output_model/
+card_output_model2/
 #clion
 .idea/
 cmake-build-debug/
@@ -38,6 +40,7 @@ cmake-build-debug/
 #dataset
 dataset/
 ext_dataset/
+cards_dataset/
 
 #cards
 generated_cards/

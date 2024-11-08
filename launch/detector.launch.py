@@ -12,7 +12,7 @@ def launch_setup(context, *args, **kwargs):
             executable="detector_node",
             name="detector_node",
             parameters=[
-                {"weights_path": "/home/ajr/ros2_ws/src/ros_yolo_model/model/second_train/weights/best.pt"},
+                {"weights_path": LaunchConfiguration("weights_path")},
                 {"source_type": source_type},
                 {"video_path": LaunchConfiguration("video_path")},
                 {"image_path": LaunchConfiguration("image_path")},
@@ -37,6 +37,7 @@ def launch_setup(context, *args, **kwargs):
 
 def generate_launch_description():
     return LaunchDescription([
+        DeclareLaunchArgument("weights_path", default_value="/home/ajr/ros2_ws/src/ros_yolo_model/model/second_train/weights/best.pt", description="Modell súlyok elérési útvonala"),
         DeclareLaunchArgument("source_type", default_value="camera", description="Forrás típusa: camera, video, vagy image"),
         DeclareLaunchArgument("video_path", default_value="/path/to/video.mp4", description="Videó fájl elérési útvonala"),
         DeclareLaunchArgument("image_path", default_value="/path/to/image.jpg", description="Kép fájl elérési útvonala"),
