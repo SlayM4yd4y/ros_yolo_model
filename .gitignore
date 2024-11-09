@@ -41,6 +41,9 @@ cmake-build-debug/
 dataset/
 ext_dataset/
 cards_dataset/
+merged_dataset/
+merged_dataset_outputTEST/
+merged_dataset_model/
 
 #cards
 generated_cards/
