@@ -13,7 +13,7 @@ CardAugmenterNode::CardAugmenterNode(const std::string& cards_dir, const std::st
     std::string backgrounds_dir = "/home/ajr/ros2_ws/src/ros_yolo_model/img/background_samples";  
     for (const auto& entry : fs::directory_iterator(backgrounds_dir)) {
         background_images_paths_.emplace_back(entry.path().string());
-        if (background_images_paths_.size() >= 10) break;
+        if (background_images_paths_.size() >= 20) break;
     }
     if (background_images_paths_.empty() || card_images_.empty()) {
         RCLCPP_ERROR(this->get_logger(), "Üres kártya- vagy háttérkép-mappa.");
@@ -116,7 +116,7 @@ inline void CardAugmenterNode::saveGeneratedImage(const cv::Mat& image, int inde
         RCLCPP_ERROR(this->get_logger(), "Az elmenteni kívánt kép üres, nem lehet menteni.");
         return;
     }
-    std::string output_path = output_dir_ + "/generated_image_" + std::to_string(index) + ".jpg";
+    std::string output_path = output_dir_ + "/generated_image__" + std::to_string(index) + ".jpg";
     cv::imwrite(output_path, image);
     RCLCPP_INFO(this->get_logger(), "Kép elmentve: %s", output_path.c_str());
 }
