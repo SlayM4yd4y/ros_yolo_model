@@ -7,13 +7,13 @@ DetectorNode::DetectorNode() : Node("detector_node") {
     RCLCPP_INFO(this->get_logger(), "DetectorNode konstruktora elindult.");
     weights_path_ = declare_parameter("weights_path", "/home/ajr/ros2_ws/src/ros_yolo_model/model/fifth_train[cards]/weights/best.pt");
     source_type_ = declare_parameter("source_type", "camera");
-    video_path_ = declare_parameter("video_path", "/path/to/video.mp4");
-    image_path_ = declare_parameter("image_path", "/path/to/image.jpg");
+    video_path_ = declare_parameter("video_path", "path");
+    image_path_ = declare_parameter("image_path", "path");
     camera_id_ = declare_parameter("camera_id", 0);
     conf_thres_ = declare_parameter("conf_thres", 0.25);
     iou_thres_ = declare_parameter("iou_thres", 0.45);
     save_results_ = declare_parameter("save_results", true);
-    save_dir_ = declare_parameter("save_dir", "/path/to/output");
+    save_dir_ = declare_parameter("save_dir", "path");
     view_img_ = declare_parameter("view_img", true);
 
     image_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
