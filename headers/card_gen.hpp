@@ -13,7 +13,7 @@
 class CardGenerator : public rclcpp::Node
 {
 private:
-    //static int counter;
+    static int counter;  // Static counter for card numbering
     std::vector<std::string> names;
     std::vector<std::string> nCodes;
     std::vector<std::string> ids;
