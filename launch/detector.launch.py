@@ -5,6 +5,8 @@ from launch.substitutions import LaunchConfiguration
 
 def launch_setup(context, *args, **kwargs):
     source_type = LaunchConfiguration("source_type").perform(context)
+    save_results = LaunchConfiguration("save_results").perform(context).lower() == "true"
+    save_dir = LaunchConfiguration("save_dir").perform(context)
     nodes = []
     nodes.append(
         Node(
@@ -17,7 +19,8 @@ def launch_setup(context, *args, **kwargs):
                 {"video_path": LaunchConfiguration("video_path")},
                 {"image_path": LaunchConfiguration("image_path")},
                 {"camera_id": LaunchConfiguration("camera_id")},
-                {"save_dir": "/home/ajr/ros2_ws/src/ros_yolo_model/det_results"},
+                {"save_results": save_results},
+                {"save_dir": save_dir},
                 {"view_img": LaunchConfiguration("view_img")}
             ],
             output="screen"
@@ -37,11 +40,13 @@ def launch_setup(context, *args, **kwargs):
 
 def generate_launch_description():
     return LaunchDescription([
-        DeclareLaunchArgument("weights_path", default_value="/home/ajr/ros2_ws/src/ros_yolo_model/model/second_train/weights/best.pt", description="Modell súlyok elérési útvonala"),
+        DeclareLaunchArgument("weights_path", default_value="/home/ajr/ros2_ws/src/ros_yolo_model/model/fifth_train[cards]/weights/best.pt", description="Modell súlyok elérési útvonala"),
         DeclareLaunchArgument("source_type", default_value="camera", description="Forrás típusa: camera, video, vagy image"),
-        DeclareLaunchArgument("video_path", default_value="/path/to/video.mp4", description="Videó fájl elérési útvonala"),
-        DeclareLaunchArgument("image_path", default_value="/path/to/image.jpg", description="Kép fájl elérési útvonala"),
+        DeclareLaunchArgument("video_path", default_value="/path/to/video.mp4", description="Videó elérési útvonala"),
+        DeclareLaunchArgument("image_path", default_value="/path/to/image.jpg", description="Kép elérési útvonala"),
         DeclareLaunchArgument("camera_id", default_value="0", description="Camera ID"),
-        DeclareLaunchArgument("view_img", default_value="false", description="Valós idejű detektálás megjelenítése"),
+        DeclareLaunchArgument("save_results", default_value="true", description="Eredmények mentése (true/false)"),
+        DeclareLaunchArgument("save_dir", default_value="/home/ajr/ros2_ws/src/ros_yolo_model/det_results", description="Eredmények mentési mappája"),
+        DeclareLaunchArgument("view_img", default_value="true", description="Valós idejű detektálás megjelenítése"),
         OpaqueFunction(function=launch_setup)
     ])

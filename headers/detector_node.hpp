@@ -30,6 +30,7 @@ private:
     float conf_thres_;
     float iou_thres_;
     bool view_img_;
+    bool save_results_;
 };
 
 #endif  // DETECTOR_NODE_HPP

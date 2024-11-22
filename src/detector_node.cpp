@@ -5,13 +5,14 @@
 
 DetectorNode::DetectorNode() : Node("detector_node") {
     RCLCPP_INFO(this->get_logger(), "DetectorNode konstruktora elindult.");
-    weights_path_ = declare_parameter("weights_path", "/home/ajr/ros2_ws/src/ros_yolo_model/model/second_train/weights/best.pt");
+    weights_path_ = declare_parameter("weights_path", "/home/ajr/ros2_ws/src/ros_yolo_model/model/fifth_train[cards]/weights/best.pt");
     source_type_ = declare_parameter("source_type", "camera");
     video_path_ = declare_parameter("video_path", "/path/to/video.mp4");
     image_path_ = declare_parameter("image_path", "/path/to/image.jpg");
     camera_id_ = declare_parameter("camera_id", 0);
     conf_thres_ = declare_parameter("conf_thres", 0.25);
     iou_thres_ = declare_parameter("iou_thres", 0.45);
+    save_results_ = declare_parameter("save_results", true);
     save_dir_ = declare_parameter("save_dir", "/path/to/output");
     view_img_ = declare_parameter("view_img", true);
 
@@ -48,10 +49,9 @@ void DetectorNode::executeDetectionCommand(const std::string& source) {
     command << "python3 /home/ajr/ros2_ws/src/yolov5/detect.py --weights " << weights_path_
             << " --source " << source
             << " --conf-thres " << conf_thres_
-            << " --iou-thres " << iou_thres_
-            << " --project " << save_dir_
-            << " --save-txt";
+            << " --iou-thres " << iou_thres_;
 
+    if (save_results_) { command << " --project " << save_dir_ << " --save-txt"; }
     if (view_img_) { command << " --view-img"; }
 
     std::string command_str = command.str();
