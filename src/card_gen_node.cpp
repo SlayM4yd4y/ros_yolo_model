@@ -1,18 +1,20 @@
 #include "card_gen.hpp"
 #include <unordered_map>
+#include <get_package_path.hpp>
 
 int CardGenerator::counter = 1;
 
 CardGenerator::CardGenerator() : Node("card_generator") {
     RCLCPP_INFO(this->get_logger(), "Card Generator Node Started");
     
+    std::string pkg_path = package_path();
     names = {"John Doe", "Jane Doe", "John Smith"};
     nCodes = {"A1B2C3", "D4E5F6", "G7H8I9"};
     ids = {"56981237", "66982238", "45981239"};
     cardIds = {"15268647", "25268648", "85268649"};
-    images = {package_path()+"/img/card_gen/portrait1.png", package_path()+"/img/card_gen/portrait2.png", package_path()+"/img/card_gen/portrait3.png"};
-    barcodes = {package_path()+"/img/card_gen/rsz_barcode1.png", package_path()+"/img/card_gen/rsz_barcode2.png", package_path()+"/img/card_gen/rsz_barcode3.png"};
-    cardTemplates = {package_path()+"/img/card_gen/student_c.png", package_path()+"/img/card_gen/employee_c.png"};
+    images = {pkg_path+"/img/card_gen/portrait1.png", pkg_path+"/img/card_gen/portrait2.png", pkg_path+"/img/card_gen/portrait3.png"};
+    barcodes = {pkg_path+"/img/card_gen/rsz_barcode1.png", pkg_path+"/img/card_gen/rsz_barcode2.png", pkg_path+"/img/card_gen/rsz_barcode3.png"};
+    cardTemplates = {pkg_path+"/img/card_gen/student_c.png", pkg_path+"/img/card_gen/employee_c.png"};
 }
 
 void CardGenerator::generate_card(const std::string& output_dir) {
@@ -79,13 +81,6 @@ void CardGenerator::generate_card(const std::string& output_dir) {
 }
 
 
-std::string package_path() {
-    std::string package_name = "ros_yolo_model";
-    std::string package_path_shared = ament_index_cpp::get_package_share_directory(package_name);
-    std::string package_path = package_path_shared + "/../../../../src/ros_yolo_model";
-    std::cout << "The package path is: " << package_path << std::endl;
-    return package_path;
-}
 
 int main(int argc, char **argv) {
     rclcpp::init(argc, argv);

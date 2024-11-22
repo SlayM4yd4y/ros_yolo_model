@@ -16,6 +16,10 @@ find_package(std_msgs REQUIRED)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/headers) 
 include_directories(${OpenCV_INCLUDE_DIRS})
+add_library(get_package_path STATIC
+  src/get_package_path.cpp
+)
+ament_target_dependencies(get_package_path ament_index_cpp)
 
 add_executable(teach_node src/teach_node.cpp)
 ament_target_dependencies(teach_node rclcpp OpenCV)
@@ -24,6 +28,7 @@ ament_target_dependencies(detector_node rclcpp sensor_msgs std_msgs cv_bridge Op
 target_link_libraries(detector_node ${OpenCV_LIBRARIES})
 add_executable(card_gen_node src/card_gen_node.cpp)
 ament_target_dependencies(card_gen_node rclcpp OpenCV ament_index_cpp)
+target_link_libraries(card_gen_node get_package_path)
 add_executable(video_publisher_node src/video_publisher_node.cpp)
 ament_target_dependencies(video_publisher_node rclcpp sensor_msgs cv_bridge OpenCV)
 target_link_libraries(video_publisher_node ${OpenCV_LIBRARIES})
