@@ -35,7 +35,7 @@ ament_target_dependencies(video_publisher_node rclcpp sensor_msgs cv_bridge Open
 target_link_libraries(video_publisher_node ${OpenCV_LIBRARIES})
 add_executable(card_augmenter_node src/card_augmenter_node.cpp)
 ament_target_dependencies(card_augmenter_node rclcpp OpenCV)
-target_link_libraries(card_augmenter_node ${OpenCV_LIBRARIES})
+target_link_libraries(card_augmenter_node get_package_path ${OpenCV_LIBRARIES})
 
 
 install(TARGETS

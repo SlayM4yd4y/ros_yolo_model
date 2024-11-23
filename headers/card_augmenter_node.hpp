@@ -20,7 +20,7 @@ public:
     inline void setOutputDir(const std::string& output_dir);
 private:
     inline cv::Mat loadCardImage(const std::string& image_path);
-    cv::Mat augmentCard(const cv::Mat& card, const cv::Mat& background);
+    cv::Mat augmentCard(const cv::Mat& card, const cv::Mat background);
     inline cv::Mat loadRandomBackground();
     inline void saveGeneratedImage(const cv::Mat& image, int index);
     std::vector<cv::Mat> card_images_;

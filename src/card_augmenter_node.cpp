@@ -1,4 +1,5 @@
 #include "card_augmenter_node.hpp"
+#include "get_package_path.hpp"
 #include <opencv2/imgproc.hpp>
 #include <filesystem>
 #include <random>
@@ -10,10 +11,10 @@ CardAugmenterNode::CardAugmenterNode(const std::string& cards_dir, const std::st
     RCLCPP_INFO(this->get_logger(), "CardAugmenterNode konstruktor kezdete");
     setCardsDir(cards_dir);
     RCLCPP_INFO(this->get_logger(), "Kártyák betöltve a mappából: %s", cards_dir.c_str());
-    std::string backgrounds_dir = "/home/ajr/ros2_ws/src/ros_yolo_model/img/background_samples";  
+    std::string backgrounds_dir =   package_path() +"/img/background_samples";  
     for (const auto& entry : fs::directory_iterator(backgrounds_dir)) {
         background_images_paths_.emplace_back(entry.path().string());
-        if (background_images_paths_.size() >= 20) break;
+        if (background_images_paths_.size() >= 45) break;
     }
     if (background_images_paths_.empty() || card_images_.empty()) {
         RCLCPP_ERROR(this->get_logger(), "Üres kártya- vagy háttérkép-mappa.");
@@ -62,8 +63,8 @@ inline cv::Mat CardAugmenterNode::loadRandomBackground() {
     RCLCPP_INFO(this->get_logger(), "Háttérkép betöltése innen: %s", background_path.c_str());
     return cv::imread(background_path);
 }
-
-cv::Mat CardAugmenterNode::augmentCard(const cv::Mat& card, const cv::Mat& background) {
+//egy kártyás verzió
+/*cv::Mat CardAugmenterNode::augmentCard(const cv::Mat& card, const cv::Mat& background) {
     if (card.empty() || background.empty()) {
         RCLCPP_ERROR(this->get_logger(), "A kártya vagy a háttér üres kép!");
         return cv::Mat();
@@ -110,17 +111,69 @@ cv::Mat CardAugmenterNode::augmentCard(const cv::Mat& card, const cv::Mat& backg
         }
     }
     return augmented_background;
+}*/
+cv::Mat CardAugmenterNode::augmentCard(const cv::Mat& card, cv::Mat background) {
+    if (card.empty() || background.empty()) {
+        RCLCPP_ERROR(this->get_logger(), "A kártya vagy a háttér üres kép!");
+        return background;
+    }
+
+    //kártya átméretezése
+    double scale_factor = std::min(
+        static_cast<double>(background.cols) * 0.2 / card.cols,
+        static_cast<double>(background.rows) * 0.2 / card.rows
+    );
+
+    cv::Mat resized_card;
+    cv::resize(card, resized_card, cv::Size(), scale_factor, scale_factor);
+
+    //forgatas, uj meret
+    int max_angle = 30;
+    double angle = std::uniform_real_distribution<double>(-max_angle, max_angle)(rng_);
+    double radians = angle * CV_PI / 180.0;
+    int new_width = std::abs(resized_card.cols * std::cos(radians)) + std::abs(resized_card.rows * std::sin(radians));
+    int new_height = std::abs(resized_card.cols * std::sin(radians)) + std::abs(resized_card.rows * std::cos(radians));
+
+    cv::Mat larger_card(new_height, new_width, resized_card.type(), cv::Scalar(0, 0, 0, 0));
+    cv::Mat rotation_matrix = cv::getRotationMatrix2D(
+        cv::Point2f(resized_card.cols / 2.0, resized_card.rows / 2.0), angle, 1.0);
+    rotation_matrix.at<double>(0, 2) += (new_width - resized_card.cols) / 2.0;
+    rotation_matrix.at<double>(1, 2) += (new_height - resized_card.rows) / 2.0;
+    cv::warpAffine(resized_card, larger_card, rotation_matrix, larger_card.size(),
+                   cv::INTER_LINEAR, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0, 0));
+
+    if (larger_card.empty()) {
+        RCLCPP_ERROR(this->get_logger(), "Az elforgatott kártya üres!");
+        return background;
+    }
+
+    //random lerakas
+    std::uniform_int_distribution<int> x_dist(0, background.cols - larger_card.cols);
+    std::uniform_int_distribution<int> y_dist(0, background.rows - larger_card.rows);
+    cv::Point position(x_dist(rng_), y_dist(rng_));
+    for (int y = 0; y < larger_card.rows; ++y) {
+        for (int x = 0; x < larger_card.cols; ++x) {
+            cv::Vec4b pixel = larger_card.at<cv::Vec4b>(y, x);
+            if (pixel[3] > 0) { // Csak a nem átlátszó pixelek
+                background.at<cv::Vec3b>(position.y + y, position.x + x) =
+                    cv::Vec3b(pixel[0], pixel[1], pixel[2]);
+            }
+        }
+    }
+
+    return background;
 }
 inline void CardAugmenterNode::saveGeneratedImage(const cv::Mat& image, int index) {
     if (image.empty()) {
         RCLCPP_ERROR(this->get_logger(), "Az elmenteni kívánt kép üres, nem lehet menteni.");
         return;
     }
-    std::string output_path = output_dir_ + "/generated_image__" + std::to_string(index) + ".jpg";
+    std::string output_path = output_dir_ + "/generated_image_new_" + std::to_string(index) + ".jpg";
     cv::imwrite(output_path, image);
     RCLCPP_INFO(this->get_logger(), "Kép elmentve: %s", output_path.c_str());
 }
-void CardAugmenterNode::processAllCards() {
+//egy kártyás verzió
+/*void CardAugmenterNode::processAllCards() {
     RCLCPP_INFO(this->get_logger(), "processAllCards elkezdődött.");
     for (size_t i = 0; i < card_images_.size(); ++i) {
         RCLCPP_INFO(this->get_logger(), "Háttér betöltése...");
@@ -131,6 +184,34 @@ void CardAugmenterNode::processAllCards() {
         }
         RCLCPP_INFO(this->get_logger(), "Kártya augmentálása...");
         cv::Mat augmented_image = augmentCard(card_images_[i], background);
+        RCLCPP_INFO(this->get_logger(), "Generált kép mentése...");
+        saveGeneratedImage(augmented_image, i);
+    }
+    RCLCPP_INFO(this->get_logger(), "processAllCards befejeződött.");
+}*/
+void CardAugmenterNode::processAllCards() {
+    RCLCPP_INFO(this->get_logger(), "processAllCards elkezdődött.");
+    for (size_t i = 0; i < card_images_.size(); ++i) {
+        RCLCPP_INFO(this->get_logger(), "Háttér betöltése...");
+        cv::Mat background = loadRandomBackground();
+        if (background.empty()) {
+            RCLCPP_ERROR(this->get_logger(), "A háttérkép betöltése sikertelen.");
+            continue;
+        }
+        //random masik kartya
+        std::uniform_int_distribution<int> dist(0, card_images_.size() - 1);
+        const cv::Mat& second_card = card_images_[dist(rng_)];
+        if (second_card.empty()) {
+            RCLCPP_WARN(this->get_logger(), "A második kártya üres, nem generálható kép.");
+            continue;
+        }
+
+        RCLCPP_INFO(this->get_logger(), "Kártyák augmentálása...");
+        cv::Mat augmented_image = background.clone();
+        //augm
+        augmented_image = augmentCard(card_images_[i], augmented_image);
+        augmented_image = augmentCard(second_card, augmented_image);
+
         RCLCPP_INFO(this->get_logger(), "Generált kép mentése...");
         saveGeneratedImage(augmented_image, i);
     }
@@ -147,13 +228,10 @@ int main(int argc, char** argv) {
 
     std::string cards_dir = argv[1];
     std::string output_dir = argv[2];
-
-    // Ellenőrizzük, hogy a kártyák mappája létezik-e
     if (!fs::exists(cards_dir) || !fs::is_directory(cards_dir)) {
         std::cerr << "Hiba: A megadott kártyák mappa nem létezik vagy nem mappa: " << cards_dir << "\n";
         return 1;
     }
-    // Ellenőrizzük, hogy az output mappa létezik-e, ha nem, akkor létrehozzuk
     if (!fs::exists(output_dir)) {
         std::cout << "Az output mappa nem létezik, létrehozás: " << output_dir << "\n";
         fs::create_directories(output_dir);  
