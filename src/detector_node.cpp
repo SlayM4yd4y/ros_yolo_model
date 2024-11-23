@@ -1,11 +1,12 @@
 #include "detector_node.hpp"
+#include "get_package_path.hpp"
 #include <sstream>
 #include <cstdlib>
 #include <future>
 
 DetectorNode::DetectorNode() : Node("detector_node") {
     RCLCPP_INFO(this->get_logger(), "DetectorNode konstruktora elindult.");
-    weights_path_ = declare_parameter("weights_path", "/home/ajr/ros2_ws/src/ros_yolo_model/model/fifth_train[cards]/weights/best.pt");
+    weights_path_ = declare_parameter("weights_path", package_path() + "/model/fifth_train[cards]/weights/best.pt");
     source_type_ = declare_parameter("source_type", "camera");
     video_path_ = declare_parameter("video_path", "path");
     image_path_ = declare_parameter("image_path", "path");
@@ -46,7 +47,7 @@ void DetectorNode::executeDetectionCommand(const std::string& source) {
      RCLCPP_INFO(this->get_logger(), "executeDetectionCommand elkezdődött forrás: %s", source.c_str());
 
     std::stringstream command;
-    command << "python3 /home/ajr/ros2_ws/src/yolov5/detect.py --weights " << weights_path_
+    command << "python3 " + package_path() + "/../yolov5/detect.py --weights " << weights_path_
             << " --source " << source
             << " --conf-thres " << conf_thres_
             << " --iou-thres " << iou_thres_;

@@ -1,0 +1,48 @@
+# Rejtett fájlok és mappák
+.git
+.gitignore
+
+# Build-artifaktok
+build/
+install/
+logs/
+
+# ROS2 build fájlok
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/
+
+# Docker saját fájljai
+Dockerfile
+.dockerignore
+
+#tanitas utani fajlok(best.pt stb, lehet kesobb github lfs-el felr.)
+output_model/
+output_model2/
+output_model_fine/
+output_model_fine2/
+output_model_fine22/  
+output_model_fine23/
+output_model_fine24/
+output_model_fine25/
+output_model_fine02/
+card_output_model/
+card_output_model2/
+merged_dataset_outputTEST/
+merged_dataset_model/
+merged_dataset_model2/
+#clion
+.idea/
+cmake-build-debug/
+.vscode/
+#dataset
+dataset/
+ext_dataset/
+cards_dataset/
+merged_dataset/
+fonts/
+
+#cards
+generated_cards/
+generated_photos/
+generated_photos2/
