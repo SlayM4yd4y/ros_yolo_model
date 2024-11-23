@@ -23,6 +23,7 @@ ament_target_dependencies(get_package_path ament_index_cpp)
 
 add_executable(teach_node src/teach_node.cpp)
 ament_target_dependencies(teach_node rclcpp OpenCV)
+target_link_libraries(teach_node get_package_path)
 add_executable(detector_node src/detector_node.cpp)
 ament_target_dependencies(detector_node rclcpp sensor_msgs std_msgs cv_bridge OpenCV)
 target_link_libraries(detector_node ${OpenCV_LIBRARIES})

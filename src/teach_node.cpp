@@ -1,4 +1,5 @@
 #include "teach.hpp"
+#include "get_package_path.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <filesystem>
@@ -25,7 +26,10 @@ void YOLOTrainer::start_training(const std::string& data_yaml, const std::string
     // YOLOv5 modell fine-tuning parancs korábbi súlyokkal (best.pt) folytatva
     /*std::string command = "python3 /home/ajr/ros2_ws/src/yolov5/train.py --img 640 --batch 16 --epochs 20 --data " + data_yaml + 
                           " --weights /home/ajr/ros2_ws/src/ros_yolo_model/output_model_fine/weights/best.pt --cache --name " + model_output_path + " --hyp /home/ajr/ros2_ws/src/ros_yolo_model/dataset/hyp.yaml";*/
-    std::string command = "python3 /home/ajr/ros2_ws/src/yolov5/train.py --img 640 --batch 16 --epochs 50 --data " + data_yaml + " --weights /home/ajr/ros2_ws/src/ros_yolo_model/merged_dataset_model/weights/best.pt --cache --name " + model_output_path + " --hyp /home/ajr/ros2_ws/src/ros_yolo_model/merged_dataset/hyp.yaml";
+
+    std::string package_base_path = package_path();
+
+    std::string command = "python3 " + package_base_path + "yolov5/train.py --img 640 --batch 16 --epochs 50 --data " + data_yaml + " --weights " + package_base_path + "/merged_dataset_model/weights/best.pt --cache --name " + model_output_path + " --hyp " + "/merged_dataset/hyp.yaml";
 
     int result = std::system(command.c_str());
     if (result != 0) {RCLCPP_ERROR(this->get_logger(), "Nem sikerult a tanitas.");
