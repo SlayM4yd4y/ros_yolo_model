@@ -8,13 +8,20 @@ VideoPublisherNode::VideoPublisherNode() : Node("video_publisher_node") {
         return;
     }
     camera_id_ = declare_parameter("camera_id", 0);
+    camera_ip_ = declare_parameter("camera_ip", "http://192.168.50.118:4747/video");
     fps_ = declare_parameter("fps", 30);  
 
     image_pub_ = create_publisher<sensor_msgs::msg::Image>("image", 10);
 
-    cap_.open(camera_id_);
+    if (!camera_ip_.empty()) {
+        RCLCPP_INFO(this->get_logger(), "IP-alapú kameraforrás használata: %s", camera_ip_.c_str());
+        cap_.open(camera_ip_);
+    } else {
+        RCLCPP_INFO(this->get_logger(), "Helyi kamera használata, ID: %d", camera_id_);
+        cap_.open(camera_id_);
+    }
     if (!cap_.isOpened()) {
-        RCLCPP_ERROR(get_logger(), "Nem sikerült megnyitni a kamerát ID: %d", camera_id_);
+        RCLCPP_ERROR(get_logger(), "Nem sikerült megnyitni a kamerát.");
         rclcpp::shutdown();
     }
 

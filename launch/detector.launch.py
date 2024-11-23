@@ -19,6 +19,7 @@ def launch_setup(context, *args, **kwargs):
                 {"video_path": LaunchConfiguration("video_path")},
                 {"image_path": LaunchConfiguration("image_path")},
                 {"camera_id": LaunchConfiguration("camera_id")},
+                {"camera_ip": LaunchConfiguration("camera_ip")},
                 {"save_results": save_results},
                 {"save_dir": save_dir},
                 {"view_img": LaunchConfiguration("view_img")}
@@ -45,6 +46,7 @@ def generate_launch_description():
         DeclareLaunchArgument("video_path", default_value="/path/to/video.mp4", description="Videó elérési útvonala"),
         DeclareLaunchArgument("image_path", default_value="/path/to/image.jpg", description="Kép elérési útvonala"),
         DeclareLaunchArgument("camera_id", default_value="0", description="Camera ID"),
+        DeclareLaunchArgument("camera_ip", default_value="http://default", description="Webkamera IP címe(http://ip:port)"),
         DeclareLaunchArgument("save_results", default_value="true", description="Eredmények mentése (true/false)"),
         DeclareLaunchArgument("save_dir", default_value="/home/ajr/ros2_ws/src/ros_yolo_model/det_results", description="Eredmények mentési mappája"),
         DeclareLaunchArgument("view_img", default_value="true", description="Valós idejű detektálás megjelenítése"),

@@ -5,6 +5,7 @@
 #include <sensor_msgs/msg/image.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/opencv.hpp>
+#include <string>
 
 class VideoPublisherNode : public rclcpp::Node {
 public:
@@ -16,6 +17,7 @@ private:
     rclcpp::TimerBase::SharedPtr timer_;
     cv::VideoCapture cap_;
     int camera_id_;
+    std::string camera_ip_;
     int fps_;
 };
 

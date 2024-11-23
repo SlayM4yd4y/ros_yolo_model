@@ -13,6 +13,7 @@ public:
     DetectorNode();
     void run();
 private:
+    std::vector<std::string> parseDetectionResults(const std::string& results_dir);
     void detectImageCallback(const sensor_msgs::msg::Image::SharedPtr msg);
     void executeDetectionCommand(const std::string& source);
     void detectLiveCamera(int camera_id);
@@ -26,7 +27,8 @@ private:
     std::string video_path_;   
     std::string image_path_;
     std::string save_dir_;    
-    int camera_id_;             
+    int camera_id_;
+    std::string camera_ip_;             
     float conf_thres_;
     float iou_thres_;
     bool view_img_;
