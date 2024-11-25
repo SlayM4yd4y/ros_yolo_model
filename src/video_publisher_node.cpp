@@ -7,24 +7,29 @@ VideoPublisherNode::VideoPublisherNode() : Node("video_publisher_node") {
         rclcpp::shutdown();
         return;
     }
-    camera_id_ = declare_parameter("camera_id", 0);
-    camera_ip_ = declare_parameter("camera_ip", "http://192.168.0.11:4747/video"); //nem jo 
+    declare_parameter("camera_id", 0);
+    declare_parameter("camera_ip", "");
+    get_parameter("camera_id", camera_id_);
+    get_parameter("camera_ip", camera_ip_);
     fps_ = declare_parameter("fps", 30);  
 
     image_pub_ = create_publisher<sensor_msgs::msg::Image>("image", 10);
 
     if (!camera_ip_.empty()) {
         RCLCPP_INFO(this->get_logger(), "IP-alapú kameraforrás használata: %s", camera_ip_.c_str());
-        cap_.open(camera_ip_);
+        if (!cap_.open(camera_ip_)) {
+            RCLCPP_ERROR(this->get_logger(), "Nem sikerült megnyitni az IP-alapú kamerát: %s", camera_ip_.c_str());
+            rclcpp::shutdown();
+            return;
+        }
     } else {
         RCLCPP_INFO(this->get_logger(), "Helyi kamera használata, ID: %d", camera_id_);
-        cap_.open(camera_id_);
+        if (!cap_.open(camera_id_)) {
+            RCLCPP_ERROR(this->get_logger(), "Nem sikerült megnyitni a helyi kamerát, ID: %d", camera_id_);
+            rclcpp::shutdown();
+            return;
+        }
     }
-    if (!cap_.isOpened()) {
-        RCLCPP_ERROR(get_logger(), "Nem sikerült megnyitni a kamerát.");
-        rclcpp::shutdown();
-    }
-
     timer_ = create_wall_timer(
         std::chrono::milliseconds(1000 / fps_),
         std::bind(&VideoPublisherNode::publishFrame, this));

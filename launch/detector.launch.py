@@ -33,7 +33,10 @@ def launch_setup(context, *args, **kwargs):
                 package="ros_yolo_model",
                 executable="video_publisher_node",
                 name="video_publisher_node",
-                parameters=[{"use_camera": True}],
+                parameters=[{"use_camera": True},
+                            {"camera_ip": LaunchConfiguration("camera_ip")},
+                            {"camera_id": LaunchConfiguration("camera_id")}
+                ],
                 output="screen"
             )
         )
