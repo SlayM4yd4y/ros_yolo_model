@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <future>
 
+
 namespace fs = std::filesystem;
 
 DetectorNode::DetectorNode() : Node("detector_node") {
@@ -45,18 +46,33 @@ void DetectorNode::run() {
     RCLCPP_INFO(this->get_logger(), "Run függvény véget ért.");
 }
 
+std::string DetectorNode::getLatestExpFolder(const std::string& base_path) {
+    std::string latest_folder;
+    std::time_t latest_time = 0;
+    for (const auto& entry : fs::directory_iterator(base_path)) {
+        if (entry.is_directory() && entry.path().filename().string().rfind("exp", 0) == 0) {
+            auto mod_time = fs::last_write_time(entry);
+            auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+                mod_time - fs::file_time_type::clock::now() + std::chrono::system_clock::now());
+            auto sys_time = std::chrono::system_clock::to_time_t(sctp);
+            if (sys_time > latest_time) {
+                latest_time = sys_time;
+                latest_folder = entry.path().string();
+            }
+        }
+    }
+    return latest_folder;
+}
+
 void DetectorNode::executeDetectionCommand(const std::string& source) {
     RCLCPP_INFO(this->get_logger(), "executeDetectionCommand elkezdődött forrás: %s", source.c_str());
     std::stringstream command;
     command << "python3 " + package_path() + "/../yolov5/detect.py --weights " << weights_path_
             << " --source " << source
             << " --conf-thres " << conf_thres_
-            << " --iou-thres " << iou_thres_
-            << " --project " << save_dir_ << " --save-txt --nosave";
-
-    if (view_img_) {
-        command << " --view-img";
-    }
+            << " --iou-thres " << iou_thres_;
+    if(save_results_) {command << " --project " << save_dir_ << " --save-txt";}
+    if (view_img_) {command << " --view-img";}
     //külön szálon
     std::thread exec_thread([this, command_str = command.str()]() {
         int result = std::system(command_str.c_str());
@@ -66,16 +82,23 @@ void DetectorNode::executeDetectionCommand(const std::string& source) {
     });
 
     exec_thread.join();
-    auto detected_objects = parseDetectionResults(save_dir_ + "/exp/labels");
-    for (const auto& obj : detected_objects) {
+    if(save_results_){
+        auto detected_objects = parseDetectionResults(getLatestExpFolder(save_dir_) + "/labels");
+        for (const auto& obj : detected_objects) {
+            auto result_msg = std::make_shared<std_msgs::msg::String>();
+            result_msg->data = obj;
+            object_pub_->publish(*result_msg);
+            RCLCPP_INFO(this->get_logger(), "Detektált objektum: %s", obj.c_str());}
+    } else {
+        RCLCPP_INFO(this->get_logger(), "Nem mentett eredmény nem publikálható.");
         auto result_msg = std::make_shared<std_msgs::msg::String>();
-        result_msg->data = obj;
+        result_msg->data = "<<Nem mentett eredmény nem publikálható.>>";
         object_pub_->publish(*result_msg);
-        RCLCPP_INFO(this->get_logger(), "Detektált objektum: %s", obj.c_str());
     }
 }
 
 std::vector<std::string> DetectorNode::parseDetectionResults(const std::string& results_dir) {
+    
     std::vector<std::string> detected_objects;
     std::map<int, std::string> class_map = {
         {0, "Aeroplane"}, {1, "Bicycle"}, {2, "Bird"}, {3, "Boat"}, {4, "Bottle"},

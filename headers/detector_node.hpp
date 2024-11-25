@@ -13,6 +13,7 @@ public:
     DetectorNode();
     void run();
 private:
+    std::string getLatestExpFolder(const std::string& base_path);
     std::vector<std::string> parseDetectionResults(const std::string& results_dir);
     void detectImageCallback(const sensor_msgs::msg::Image::SharedPtr msg);
     void executeDetectionCommand(const std::string& source);

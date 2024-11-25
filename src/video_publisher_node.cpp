@@ -8,7 +8,7 @@ VideoPublisherNode::VideoPublisherNode() : Node("video_publisher_node") {
         return;
     }
     camera_id_ = declare_parameter("camera_id", 0);
-    camera_ip_ = declare_parameter("camera_ip", "http://192.168.50.118:4747/video");
+    camera_ip_ = declare_parameter("camera_ip", "http://192.168.0.11:4747/video"); //nem jo 
     fps_ = declare_parameter("fps", 30);  
 
     image_pub_ = create_publisher<sensor_msgs::msg::Image>("image", 10);
