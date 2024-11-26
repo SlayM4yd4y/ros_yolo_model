@@ -33,7 +33,7 @@ colcon build --packages-select ros_yolo_model --symlink-install
 <summary> Don't forget to source before ROS commands.</summary>
 source ~/ros2_ws/install/setup.bash
 </details>
-<div align="center"><h3>For more details visit the .wiki of this package.</h3></div>
+<div align="center"><h3>For more details visit the /wiki of this package.</h3></div>
 
 ## Diagram
 ``` mermaid
