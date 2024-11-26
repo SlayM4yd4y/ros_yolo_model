@@ -5,7 +5,7 @@ A ```ROS 2``` package, written in ```C++```, leveraging ```YOLOv5``` for object 
 * **Live Camera Detection**: Detection with camera streams.
 * **Video & Image Detection**: Process pre-recorded videos or individual images.
 * **Customizable Classes**: Detects 22 object classes, including PASCAL VOC 2012 dataset objects and custom classes like university student and employee ID cards.
-* **ROS Topics Integration**: Publishes detection results on /detected_objects.
+* **ROS Topics Integration**: Publishes detection results on `/detected_objects` topic.
 The implementation is designed to run under ROS 2 Humble.
 ### Clone the packages
 >It is assumed that the workspace is `~/ros2_ws/`.
