@@ -45,6 +45,7 @@ dataset/
 ext_dataset/
 cards_dataset/
 merged_dataset/
+train_output/
 
 
 #cards
