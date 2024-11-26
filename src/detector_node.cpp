@@ -9,7 +9,7 @@
 
 namespace fs = std::filesystem;
 
-DetectorNode::DetectorNode() : Node("detector_node") {
+DetectorNode::DetectorNode() : Node("detector_node"), stop_processing_(false) {
     RCLCPP_INFO(this->get_logger(), "DetectorNode konstruktora elindult.");
     weights_path_ = declare_parameter("weights_path", package_path() + "/model/fifth_train[cards]/weights/best.pt");
     source_type_ = declare_parameter("source_type", "camera");
@@ -27,7 +27,36 @@ DetectorNode::DetectorNode() : Node("detector_node") {
     image_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
         "/image", qos, std::bind(&DetectorNode::detectImageCallback, this, std::placeholders::_1));
     object_pub_ = this->create_publisher<std_msgs::msg::String>("/detected_objects", rclcpp::QoS(rclcpp::SystemDefaultsQoS()));
+    processing_thread_ = std::thread(&DetectorNode::processingLoop, this);
     RCLCPP_INFO(this->get_logger(), "DetectorNode sikeresen inicializálva.");
+}
+
+DetectorNode::~DetectorNode() {
+    {
+        std::lock_guard<std::mutex> lock(queue_mutex_);
+        stop_processing_ = true;
+    }
+    queue_condition_.notify_one();
+    if(processing_thread_.joinable()) {processing_thread_.join();}
+    RCLCPP_INFO(this->get_logger(), "DetectorNode destruktora sikeresen lefutott.");
+}
+
+void DetectorNode::processingLoop() {
+    while (true) {
+        cv::Mat frame;
+        {
+            std::unique_lock<std::mutex> lock(queue_mutex_);
+            queue_condition_.wait(lock, [this]() { return !frame_queue_.empty() || stop_processing_; });
+            if (stop_processing_) break;
+            frame = frame_queue_.front();
+            frame_queue_.pop();
+        }
+        if (!frame.empty()) {
+            std::string image_path = "/tmp/input_image.jpg";
+            cv::imwrite(image_path, frame);
+            executeDetectionCommand(image_path);
+        }
+    }
 }
 
 void DetectorNode::run() {
@@ -107,7 +136,6 @@ std::vector<std::string> DetectorNode::parseDetectionResults(const std::string& 
         {15, "Potted Plant"}, {16, "Sheep"}, {17, "Sofa"}, {18, "Train"}, {19, "TV Monitor"},
         {20, "Alkalmazotti Kártya"}, {21, "Hallgatói Kártya"}
     };
-
      for (const auto& entry : fs::directory_iterator(results_dir)) {
         if (entry.path().extension() == ".txt") {
             std::ifstream file(entry.path());
@@ -141,10 +169,18 @@ void DetectorNode::detectImage(const std::string& image_path) {
 }
 
 void DetectorNode::detectImageCallback(const sensor_msgs::msg::Image::SharedPtr msg) {
+    static std::mutex mtx;
+    if (!mtx.try_lock()) {
+        RCLCPP_WARN(this->get_logger(), "Már folyamatban van egy feldolgozás, kihagyom ezt a képkockát.");
+        return;
+    }
     cv::Mat frame = cv_bridge::toCvCopy(msg, "bgr8")->image;
-    std::string image_path = "/tmp/input_image.jpg";
-    cv::imwrite(image_path, frame);
-    executeDetectionCommand(image_path);
+    std::thread([this, frame, mutex_ptr = &mtx]() {
+        std::string image_path = "/tmp/input_image.jpg";
+        cv::imwrite(image_path, frame);
+        executeDetectionCommand(image_path);
+        mutex_ptr->unlock(); 
+    }).detach();
 }
 
 void DetectorNode::detectVideo(const std::string& video_path) {
@@ -155,7 +191,7 @@ int main(int argc, char **argv) {
     rclcpp::init(argc, argv);
     auto node = std::make_shared<DetectorNode>();
     node->run();
-    rclcpp::spin_some(node);
+    node->get_parameter("source_type").as_string() == "camera" ? rclcpp::spin(node) : rclcpp::spin_some(node);
     rclcpp::shutdown();
     return 0;
 }

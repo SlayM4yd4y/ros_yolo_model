@@ -7,11 +7,12 @@
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/opencv.hpp>
 #include <string>
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+#include <thread>
 
 class DetectorNode : public rclcpp::Node {
-public:
-    DetectorNode();
-    void run();
 private:
     std::string getLatestExpFolder(const std::string& base_path);
     std::vector<std::string> parseDetectionResults(const std::string& results_dir);
@@ -20,6 +21,7 @@ private:
     void detectLiveCamera(int camera_id);
     void detectImage(const std::string& image_path);
     void detectVideo(const std::string& video_path);
+    void processingLoop();
     rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr image_sub_;
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr object_pub_;
     std::string weights_path_;
@@ -34,6 +36,14 @@ private:
     float iou_thres_;
     bool view_img_;
     bool save_results_;
+    std::queue<cv::Mat> frame_queue_;
+    std::mutex queue_mutex_;
+    std::condition_variable queue_condition_;
+    bool stop_processing_;
+    std::thread processing_thread_;
+public:
+    DetectorNode();
+    ~DetectorNode();
+    void run();
 };
-
-#endif  // DETECTOR_NODE_HPP
+#endif  
