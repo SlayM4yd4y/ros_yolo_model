@@ -29,10 +29,7 @@ cd ~/ros2_ws
 colcon build --packages-select ros_yolo_model --symlink-install
 ```
 ## Run this ROS 2 package
-<details>
-<summary> Don't forget to source before ROS commands.</summary>
-source ~/ros2_ws/install/setup.bash
-</details>
+
 <div align="center"><h3>For more details visit the /wiki of this package.</h3></div>
 
 ## Diagram
