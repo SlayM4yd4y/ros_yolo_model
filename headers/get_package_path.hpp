@@ -5,4 +5,4 @@
 
 std::string package_path();
 
-#endif // GET_PACKAGE_PATH_HPP
+#endif 

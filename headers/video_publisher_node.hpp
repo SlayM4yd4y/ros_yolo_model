@@ -21,4 +21,4 @@ private:
     int fps_;
 };
 
-#endif  // VIDEO_PUBLISHER_NODE_HPP
+#endif  

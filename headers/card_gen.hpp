@@ -13,7 +13,7 @@
 class CardGenerator : public rclcpp::Node
 {
 private:
-    static int counter;  // Static counter for card numbering
+    static int counter;  
     std::vector<std::string> names;
     std::vector<std::string> nCodes;
     std::vector<std::string> ids;
@@ -27,4 +27,4 @@ public:
     void generate_card(const std::string& output_dir);
 };
 
-#endif  // ROS_YOLO_MODEL_CARD_GEN_HPP_
+#endif  

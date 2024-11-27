@@ -29,4 +29,4 @@ private:
     mutable std::mt19937 rng_;
 };
 
-#endif // CARD_AUGMENTER_NODE_HPP
+#endif 
