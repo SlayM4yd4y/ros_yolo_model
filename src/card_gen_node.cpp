@@ -5,7 +5,7 @@
 int CardGenerator::counter = 1;
 
 CardGenerator::CardGenerator() : Node("card_generator") {
-    RCLCPP_INFO(this->get_logger(), "Card Generator Node Started");
+    RCLCPP_INFO(this->get_logger(), "Node inicializálása");
     
     std::string pkg_path = package_path();
     names = {"John Doe", "Jane Doe", "John Smith"};
@@ -18,9 +18,9 @@ CardGenerator::CardGenerator() : Node("card_generator") {
 }
 
 void CardGenerator::generate_card(const std::string& output_dir) {
-    RCLCPP_INFO(this->get_logger(), "Generating cards without nested loops...");
+    RCLCPP_INFO(this->get_logger(), "Kartyak generalasa...");
 
-    // Ensure the output directory exists
+    // Ellenőrizze, hogy a kimeneti könyvtár létezik-e, ha nem, hozza létre
     if (!std::filesystem::exists(output_dir)) {
         std::filesystem::create_directories(output_dir);
     }
@@ -29,7 +29,7 @@ void CardGenerator::generate_card(const std::string& output_dir) {
     int counter = 0;
 
     for (int i = 0; i < total_combinations; ++i) {
-        // Calculate indices for each attribute based on `i`
+        // Számolja ki az indexeket a különböző vektorokból
         int template_idx = (i / (names.size() * nCodes.size() * ids.size() * images.size() * barcodes.size())) % cardTemplates.size();
         int name_idx = (i / (nCodes.size() * ids.size() * images.size() * barcodes.size())) % names.size();
         int nCode_idx = (i / (ids.size() * images.size() * barcodes.size())) % nCodes.size();
@@ -37,7 +37,7 @@ void CardGenerator::generate_card(const std::string& output_dir) {
         int image_idx = (i / barcodes.size()) % images.size();
         int barcode_idx = i % barcodes.size();
 
-        // Load the template, image, and barcode based on computed indices
+        // Töltse be a kártya sablonját, képet és vonalkódot
         cv::Mat card(359, 553, CV_8UC3, cv::Scalar(255, 255, 255));
         auto ft2 = cv::freetype::createFreeType2();
         ft2->loadFontData(package_path() + "/fonts/Montserrat/Montserrat-VariableFont_wght.ttf", 0);
@@ -46,9 +46,9 @@ void CardGenerator::generate_card(const std::string& output_dir) {
         cv::Mat image = cv::imread(images[image_idx]);
         cv::Mat barcode = cv::imread(barcodes[barcode_idx]);
 
-        // Place elements based on template type
+        // Helyezze el a képeket és a szöveget a kártyán
         if (cardTemplates[template_idx].find("student") != std::string::npos) {
-            // Student card layout
+            // Hallgatói kártya elrendezése
             cv::Rect ct(cv::Point(0, 0), card_template.size());
             cv::Rect bc(cv::Point(41, 29), barcode.size());
             cv::Rect pt(cv::Point(382, 122), image.size());
@@ -60,7 +60,7 @@ void CardGenerator::generate_card(const std::string& output_dir) {
             ft2->putText(card, "H" + cardIds[id_idx], cv::Point(158, 230), 15, cv::Scalar(0, 0, 0), 1, cv::LINE_AA, false);
             ft2->putText(card, nCodes[nCode_idx], cv::Point(157, 260), 15, cv::Scalar(0, 0, 0), 1, cv::LINE_AA, false);
         } else {
-            // Employee card layout
+            // Alkalmazotti kártya elrendezése
             cv::Rect ct(cv::Point(0, 0), card_template.size());
             cv::Rect bc(cv::Point(49, 22), barcode.size());
             cv::Rect pt(cv::Point(386, 123), image.size());
@@ -73,10 +73,10 @@ void CardGenerator::generate_card(const std::string& output_dir) {
             ft2->putText(card, ids[id_idx], cv::Point(165, 260), 15, cv::Scalar(0, 0, 0), 1, cv::LINE_AA, false);
         }
 
-        // Save the card
+        // Kártáya mentése
         std::string card_filename = output_dir + "/card" + std::to_string(counter++) + ".png";
         cv::imwrite(card_filename, card);
-        RCLCPP_INFO(this->get_logger(), "Card saved to %s", card_filename.c_str());
+        RCLCPP_INFO(this->get_logger(), "Kartya mentve a kovetkezo helyre:  %s", card_filename.c_str());
     }
 }
 
