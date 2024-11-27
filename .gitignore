@@ -36,6 +36,13 @@ card_output_model2/
 merged_dataset_outputTEST/
 merged_dataset_model/
 merged_dataset_model2/
+latest_output_model/
+latest_output_modelTEST
+latest_output_modelTEST2/
+latest_output_modelTEST3/
+latest_output_modelTEST4/
+latest_output_modelTEST5/
+latest_output_modelTEST6/
 #clion
 .idea/
 cmake-build-debug/
